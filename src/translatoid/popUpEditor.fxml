@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label prefHeight="24.0" prefWidth="236.0" text="English Text:" textAlignment="RIGHT">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets left="5.0" />
+               </padding>
+            </Label>
+            <TextArea fx:id="engTextArea" editable="false" prefHeight="150.0" prefWidth="507.0" wrapText="true" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="20.0" right="10.0" top="10.0" />
+               </HBox.margin>
+            </TextArea>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label prefHeight="24.0" prefWidth="185.0" text="Translated Text:" textAlignment="RIGHT">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Label>
+            <TextArea fx:id="translatedTextArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextArea>
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="editorApply" mnemonicParsing="false" text="Cancel">
+               <HBox.margin>
+                  <Insets bottom="10.0" right="90.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="editorPrevious" mnemonicParsing="false" text="&lt; Previous String">
+               <HBox.margin>
+                  <Insets bottom="10.0" right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="editorNext" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Next String &gt;">
+               <HBox.margin>
+                  <Insets bottom="10.0" right="100.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="editorCancel" mnemonicParsing="false" text="Apply">
+               <HBox.margin>
+                  <Insets bottom="10.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+  </children>
+</VBox>

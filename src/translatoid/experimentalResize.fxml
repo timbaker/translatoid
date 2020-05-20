@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="translatoid.Controller">
+   <children>
+      <MenuBar prefHeight="29.0" prefWidth="1024.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="menuOpenLanguage" mnemonicParsing="false" onAction="#populateTranslationFolder" text="Open..." />
+                  <MenuItem mnemonicParsing="false" onAction="#saveTranslations" text="Save Translations" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+              <items>
+                <MenuItem fx:id="itemEnglishToggle" mnemonicParsing="false" text="Toggle English Column" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Options" visible="false">
+              <items>
+                <MenuItem fx:id="generateTranslationReport" mnemonicParsing="false" text="Generate Translation Report" />
+              </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <TabPane prefHeight="776.0" prefWidth="1024.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+         <tabs>
+            <Tab text="Translate">
+               <content>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="Languages">
+                                 <content>
+                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                       <children>
+                                          <ListView fx:id="translationFolderLanguages" onMouseClicked="#onListViewClick" prefHeight="704.0" prefWidth="198.0" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                 </content>
+                            </Tab>
+                            <Tab text="Files">
+                                 <content>
+                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                       <children>
+                                          <TreeView fx:id="fileTreeView" prefHeight="710.0" prefWidth="199.0" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                 </content>
+                            </Tab>
+                          </tabs>
+                        </TabPane>
+                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox prefHeight="27.0" prefWidth="719.0">
+                                 <children>
+                                    <ChoiceBox fx:id="filterDropdown" prefWidth="150.0" />
+                                    <TextField fx:id="filterText" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <TableView fx:id="translationTable" editable="true" prefHeight="690.0" prefWidth="714.0" VBox.vgrow="ALWAYS">
+                                 <columns>
+                                    <TableColumn fx:id="translateKey" editable="false" prefWidth="313.0" text="Key" />
+                                    <TableColumn fx:id="translateValue" minWidth="0.0" prefWidth="387.0" text="Value" />
+                                    <TableColumn fx:id="translateEnglish" editable="false" prefWidth="75.0" text="English" />
+                                 </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </content>
+            </Tab>
+            <Tab text="Item File Conversion">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ListView fx:id="itemConversionListView" prefHeight="696.0" prefWidth="1024.0" VBox.vgrow="ALWAYS" />
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                           <children>
+                              <Button fx:id="itemConversionAddFile" mnemonicParsing="false" onAction="#addFileItemConverter" text="Add File" />
+                              <Button mnemonicParsing="false" onAction="#addFolderItemConverter" text="Add Folder" />
+                              <Button mnemonicParsing="false" onAction="#convertRecipeFileToTranslation" text="Create Recipes Translation" />
+                              <Button fx:id="itemConversionConvert" mnemonicParsing="false" onAction="#convertItemFileToTranslation" text="Create Items Translation" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </children>
+</VBox>

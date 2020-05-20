@@ -1,0 +1,4 @@
+//Each charset override should be it's own line, see below. Charsets can be found at https://docs.oracle.com/javase/8/docs/technotes/guides/intl/encoding.doc.html use the java.api column.
+//IF YOU DON'T KNOW WHAT YOU'RE DOING DO NOT CHANGE ANYTHING IN HERE
+//EN=UTF-8
+//FR=Cp1252
