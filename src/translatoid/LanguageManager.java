@@ -21,21 +21,18 @@ public class LanguageManager {
 
     private static Map<String, TranslateItem> currentEnglishMap;
     private static Map<String, TranslateItem> previousEnglishMap;
-    private static Map<String, TranslateItem> masterList = new HashMap<>();
-    private int modifiedStrings = 0;
-    private int deletedStrings = 0;
-    private int addedStrings = 0;
-    private static Map<String, String> charsets = new HashMap<>();
-    private static String fileName = "_englishcache_v1.properties";
+    private static final Map<String, TranslateItem> masterList = new HashMap<>();
+    private static final Map<String, String> charsets = new HashMap<>();
+    private static final String fileName = "_englishcache_v1.properties";
     public static boolean unsavedChanges = false;
-    //private static final Node addIcon = new ImageView(new Image(getClass().getResourceAsStream("media/icons/add.png")));
 
     public static ObservableList<File> openTranslationFolder(File folder) {
         boolean engFolderFound = false;
         ObservableList<File> results = FXCollections.observableArrayList();
         if (folder != null && folder.isDirectory()) {
-            if (folder.listFiles() != null) {
-                for (File f : folder.listFiles()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File f : files) {
                     currentLanguage = folder.getName();
                     if (f.getName().equals("EN")) {
                         Map<TreeItem<File>, ObservableList<TranslateItem>> enMap = new HashMap<>();
@@ -130,8 +127,9 @@ public class LanguageManager {
 
     public static void populateTreeItems(File folder, TreeItem<File> root, Map<TreeItem<File>, ObservableList<TranslateItem>> map) {
         if (folder != null && folder.isDirectory()) {
-            if (folder.listFiles() != null) {
-                for (File f : Objects.requireNonNull(folder.listFiles())) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File f : files) {
                     TreeItem<File> item = new TreeItem<>(f);
                     if (f.isDirectory()) {
                         populateTreeItems(f, item, map);

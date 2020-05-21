@@ -5,8 +5,6 @@ import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,17 +15,20 @@ public class ItemConverter {
 
     private ArrayList<String> result;
     private HashMap<String, String> map;
-    private String charset = "windows-1252";
+    private final String charset = "windows-1252";
     int count;
     Path path;
+    private final StringBuilder m_stringBuilder = new StringBuilder();
+    private boolean m_findRecipe;
+    private String m_moduleName;
 
     public void convertFiles(ObservableList<File> files, boolean findRecipe) {
         count = 0;
         result = new ArrayList<>();
         map = new HashMap<>();
         if (!findRecipe) {
-            path = Paths.get("Items_empty.txt");
-            result.add("Items_EN = {");
+            path = Paths.get("ItemName_empty.txt");
+            result.add("ItemName_EN = {");
         }
         else {
             path = Paths.get("Recipe_empty.txt");
@@ -35,19 +36,19 @@ public class ItemConverter {
         }
 
         for (File f : files) {
-            if (findRecipe)
-                parseFile(f, true);
-            else
-                parseFile(f, false);
+            parseFileOrFolder(f, findRecipe);
         }
+        
+        ArrayList<String> sorted = new ArrayList<>(map.keySet());
+        Collections.sort(sorted);
 
-        for (Map.Entry element : map.entrySet()) {
+        for (String key : sorted) {
             StringBuilder sb = new StringBuilder();
             sb.append("    ");
-            sb.append(element.getKey());
+            sb.append(key);
             sb.append(" = ");
             sb.append("\"");
-            sb.append(element.getValue());
+            sb.append(map.get(key));
             sb.append("\",");
             result.add(sb.toString());
         }
@@ -65,73 +66,167 @@ public class ItemConverter {
         alert.showAndWait();
     }
 
-    public void parseFile(File f, boolean findRecipe) {
+    /**
+     * Convert Items_XX.txt to ItemName_XX.txt for the currently-selected language.
+     * @param files
+     * @param languageFolder
+     */
+    public void convertItemsDotTxt(ObservableList<File> files, File languageFolder, Charset charSet, ObservableList<TranslateItem> items) {
+        count = 0;
+        map = new HashMap<>();
+
+        // Fill map with "ItemName_Module.type = DisplayName".
+        for (File f : files) {
+            parseFileOrFolder(f, false);
+        }
+
+        ArrayList<String> sorted = new ArrayList<>(map.keySet());
+        Collections.sort(sorted);
+        
+        HashMap<String, String> DisplayNames = new HashMap<>();
+        for (TranslateItem item : items) {
+            // key: DisplayName_<mangled english name>
+            // value: translated item name
+            DisplayNames.put(item.getKey(), item.getValue());
+        }
+
+        result = new ArrayList<>();
+        result.add("ItemName_" + languageFolder.getName() + " = {");
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String key : sorted) {
+            String key2 = "DisplayName_" +  map.get(key).replace(' ', '_').replace(",", "").replace("-", "_");
+            String DisplayName = DisplayNames.get(key2);
+            if (DisplayName == null) {
+                continue;
+            }
+            sb.setLength(0);
+            sb.append("    ");
+            sb.append(key);
+            sb.append(" = ");
+            sb.append("\"");
+            sb.append(DisplayName);
+            sb.append("\",");
+            result.add(sb.toString());
+        }
+
+        result.add("}");
+
+        Alert alert;
         try {
-            if (!f.isDirectory()) {
-                BufferedReader reader = Files.newBufferedReader(Paths.get(f.getAbsolutePath()));
-                String line;
-                String[] lineArr;
-                boolean inItem = false;
-                boolean foundDisplayName = false;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (!inItem) {
-                        lineArr = line.split(" ");
-                        if (lineArr[0].equals("item") && !findRecipe) {
-                            inItem = true;
-                        }
-                        else if (lineArr[0].equals("recipe") && findRecipe) {
-                            StringBuilder sb = new StringBuilder();
-                            StringBuilder recipeName = new StringBuilder();
-                            sb.append("Recipe");
-                            for (String s : lineArr) {
-                                if (!s.equals("recipe")) {
-                                    sb.append("_");
-                                    sb.append(s);
-                                    if (recipeName.length() == 0) {
-                                        recipeName.append(s);
-                                    }
-                                    else {
-                                        recipeName.append(" ");
-                                        recipeName.append(s);
-                                    }
-                                }
-                            }
+            path = Paths.get(languageFolder.getAbsolutePath()).resolve("ItemName_" + languageFolder.getName() + ".txt");
+            Files.write(path, result, charSet);
+        } catch (Exception e) {
+            alert = LanguageManager.generateAlert("Exception Dialog", "An exception was hit while writing the file!", e.toString(), Alert.AlertType.ERROR);
+            alert.showAndWait();
+        }
 
-                            map.put(sb.toString(), recipeName.toString());
-                            count++;
-                        }
-                    } else {
-                        if (line.equals("}")) {
-                            inItem = false;
-                            foundDisplayName = false;
-                        } else {
-                            if (!foundDisplayName) {
-                                lineArr = line.split("=");
-                                if (lineArr.length >= 2) {
-                                    lineArr[0] = lineArr[0].trim();
-                                    if (lineArr[0].equals("DisplayName")) {
-                                        lineArr[1] = lineArr[1].trim();
-                                        String itemName = lineArr[1].replace(",", "");
-                                        String formatted = "DisplayName_" + lineArr[1].replace(' ', '_').replace(",", "").replace("-", "_");
-                                        map.put(formatted, itemName);
-                                        foundDisplayName = true;
-                                        count++;
-                                    }
-                                }
-                            }
-                        }
+        alert = LanguageManager.generateAlert("Operation Complete", null, "Parsed " + count + " lines of data.", Alert.AlertType.INFORMATION);
+        alert.showAndWait();
+    }
+    
+    private void parseItem(String token) {
+        String[] tokens = token.split("[{}]");
+        String name = tokens[0];
+        name = name.replace("item", "");
+        name = name.trim();
+        String[] keyValues = tokens[1].split(",");
+        for (String keyValue : keyValues) {
+            if (keyValue.trim().length() == 0) {
+                continue;
+            }
+            if (!keyValue.contains("=")) {
+                continue;
+            }
+            String[] ss = keyValue.split("=");
+            String key = ss[0].trim();
+            String value = ss[1].trim();
+            if ("DisplayName".equalsIgnoreCase(key)) {
+                String formatted = "DisplayName_" + value.replace(' ', '_').replace(",", "").replace("-", "_");
+                formatted = "ItemName_" + m_moduleName + "." + name;
+                map.put(formatted, value);
+                count++;
+            }
+        }
+    }
+
+    private void parseRecipe(String token) {
+        String tokens[] = token.split("[{}]");
+        String name = tokens[0];
+        name = name.replace("recipe", "");
+        name = name.trim();
+        map.put("Recipe_" + name.replaceAll(" ", "_"), name);
+        count++;
+    }
+
+    private void parseModuleToken(String token) {
+        token = token.trim();
+        if (m_findRecipe) {
+            if (token.indexOf("recipe") == 0) {
+                parseRecipe(token);
+            }
+        } else {
+            if (token.indexOf("item") == 0) {
+                parseItem(token);
+            }
+        }
+    }
+
+    private void parseModule(String moduleName, String token) {
+        m_moduleName = moduleName;
+        ArrayList<String> tokens = ScriptParser.parseTokens(token);
+        for (int n = 0; n < tokens.size(); n++) {
+            String token1 = tokens.get(n);
+            parseModuleToken(token1);
+        }
+    }
+
+    private void parseFile(String token) {
+        token = token.trim();
+        if (token.indexOf("module") == 0) {
+            int firstopen = token.indexOf("{");
+            int lastClose = token.lastIndexOf("}");
+            String[] ss = token.split("[{}]");
+            String name = ss[0];
+            name = name.replace("module", "");
+            name = name.trim();
+            String token1 = token.substring(firstopen + 1, lastClose);
+            parseModule(name, token1);
+        }
+    }
+
+    private void parseFile(File f) throws Exception {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(f.getAbsolutePath()))) {
+            m_stringBuilder.setLength(0);
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null) {
+                m_stringBuilder.append(inputLine);
+                m_stringBuilder.append('\n');
+            }
+            String totalFile = m_stringBuilder.toString();
+            totalFile = ScriptParser.stripComments(totalFile);
+            ArrayList<String> Tokens = ScriptParser.parseTokens(totalFile);
+            for (int n = 0; n < Tokens.size(); n++) {
+                String token = Tokens.get(n);
+                parseFile(token);
+            }
+        }
+    }
+
+    public void parseFileOrFolder(File f, boolean findRecipe) {
+        m_findRecipe = findRecipe;
+        try {
+            if (f.isDirectory()) {
+                File[] files = f.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        parseFileOrFolder(file, findRecipe);
                     }
                 }
+            } else {
+                parseFile(f);
             }
-            else {
-                if (f.listFiles() != null) {
-                    for (File file : f.listFiles()) {
-                        parseFile(file, findRecipe);
-                    }
-                }
-            }
-
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Exception Dialog");
@@ -141,7 +236,7 @@ public class ItemConverter {
         }
     }
 
-    public void parseFile(File f) {
-        parseFile(f, false);
+    public void parseFileOrFolder(File f) {
+        parseFileOrFolder(f, false);
     }
 }

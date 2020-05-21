@@ -91,6 +91,7 @@
                               <Button mnemonicParsing="false" onAction="#addFolderItemConverter" text="Add Folder" />
                               <Button mnemonicParsing="false" onAction="#convertRecipeFileToTranslation" text="Create Recipes Translation" />
                               <Button fx:id="itemConversionConvert" mnemonicParsing="false" onAction="#convertItemFileToTranslation" text="Create Items Translation" />
+                              <Button fx:id="convertItemsDotTxt" mnemonicParsing="false" onAction="#convertItemsDotTxt" text="Convert Items.txt" />
                            </children>
                         </HBox>
                      </children>

@@ -355,6 +355,18 @@ public class Controller {
         converter.convertFiles(items, true);
     }
 
+    public void convertItemsDotTxt(ActionEvent actionEvent) {
+        for (int i = 0; i < rootItem.getChildren().size(); i++) {
+            TreeItem<File> item = rootItem.getChildren().get(i);
+            File file = item.getValue();
+            if (file.getName().equalsIgnoreCase("Items_" + currentFolder.getName() + ".txt")) {
+                ObservableList<TranslateItem> items = fileMap.get(item);
+                converter.convertItemsDotTxt(this.items, currentFolder, currentCharset, items);
+                break;
+            }
+        }
+    }
+
     //TRANSLATE TAB CODE BELOW
     @Deprecated
     public void onTreeViewClick() {
@@ -388,7 +400,9 @@ public class Controller {
         for (Map.Entry<TreeItem<File>, ObservableList<TranslateItem>> entry : fileMap.entrySet()) {
             List<String> lines = new ArrayList<>();
             lines.add(entry.getKey().getValue().getName().replace(".txt", "") + " = {");
-            for (TranslateItem item : entry.getValue()) {
+            ArrayList<TranslateItem> sorted = new ArrayList<>(entry.getValue());
+            sorted.sort(Comparator.comparing(TranslateItem::getKey));
+            for (TranslateItem item : sorted) {
                 if (!item.isIgnore() && item.getStatus() != KeyStatus.ADDED) {
                     lines.add("    " + item.getKey() + " = \"" + item.getValue() + "\",");
                 }
