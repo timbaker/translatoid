@@ -356,6 +356,20 @@ public class Controller {
     }
 
     public void convertItemsDotTxt(ActionEvent actionEvent) {
+        if (currentFolder == null) {
+            Alert alert = LanguageManager.generateAlert("Error", "Failed to create ItemName_XX.txt.",
+                    "No language is selected.  Use 'Open...' in the File menu to choose the translations folder, then select a language.",
+                    Alert.AlertType.ERROR);
+            alert.showAndWait();
+            return;
+        }
+        if (items == null || items.isEmpty()) {
+            Alert alert = LanguageManager.generateAlert("Error", "Failed to create ItemName_XX.txt.",
+                    "Use the 'Add Folder' button to add the media\\scripts folder.",
+                    Alert.AlertType.ERROR);
+            alert.showAndWait();
+            return;
+        }
         for (int i = 0; i < rootItem.getChildren().size(); i++) {
             TreeItem<File> item = rootItem.getChildren().get(i);
             File file = item.getValue();
