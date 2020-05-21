@@ -96,10 +96,13 @@ public class ItemConverter {
         StringBuilder sb = new StringBuilder();
 
         for (String key : sorted) {
-            String key2 = "DisplayName_" +  map.get(key).replace(' ', '_').replace(",", "").replace("-", "_");
-            String DisplayName = DisplayNames.get(key2);
+            String key2 = map.get(key).replace(' ', '_').replace(",", "").replace("-", "_");
+            String DisplayName = DisplayNames.get("DisplayName_" +  key2);
             if (DisplayName == null) {
-                continue;
+                DisplayName = DisplayNames.get("DisplayName" +  key2);
+                if (DisplayName == null) {
+                    continue;
+                }
             }
             sb.setLength(0);
             sb.append("    ");
