@@ -93,19 +93,19 @@ public class Controller {
     private TreeItem<File> rootItem;
     private Map<TreeItem<File>, ObservableList<TranslateItem>> fileMap;
     private Charset currentCharset = Charset.forName("Cp1252");
-    private ContextMenu cm = new ContextMenu();
-    private MenuItem resolveString = new MenuItem("Mark as Resolved");
-    private MenuItem removeString = new MenuItem("Remove String");
-    private MenuItem keepString = new MenuItem("Keep String");
-    //private MenuItem openEditor = new MenuItem("Open String Editor");
-    private MenuItem addString = new MenuItem();
+    private final ContextMenu cm = new ContextMenu();
+    private final MenuItem resolveString = new MenuItem("Mark as Resolved");
+    private final MenuItem removeString = new MenuItem("Remove String");
+    private final MenuItem keepString = new MenuItem("Keep String");
+    private final MenuItem openEditor = new MenuItem("Open String Editor");
+    private final MenuItem addString = new MenuItem();
     private TreeItem<File> currentFile;
     private File currentFolder;
     private Stage currentStage;
     private Alert alert;
-    private String addIcon = "/icons/add.png";
-    private String editIcon = "/icons/page_edit.png";
-    private String deleteIcon = "/icons/delete.png";
+    private final String addIcon = "/icons/add.png";
+    private final String editIcon = "/icons/page_edit.png";
+    private final String deleteIcon = "/icons/delete.png";
     private FilterMode filterMode = FilterMode.NONE;
     private ObservableList<TranslateItem> originalList;
 
@@ -193,7 +193,7 @@ public class Controller {
                         cm.getItems().add(removeString);
                         //cm.getItems().add(keepString);
                     }
-                    //cm.getItems().add(openEditor);
+                    cm.getItems().add(openEditor);
                     cm.show(translationTable, t.getScreenX(), t.getScreenY());
                 }
                 else {
@@ -262,22 +262,14 @@ public class Controller {
             }
         });
 
-        /*openEditor.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Parent root;
-                try {
-                    root = FXMLLoader.load(getClass().getResource("popUpEditor.fxml"));
-                    Stage stage = new Stage();
-                    stage.setTitle("String Editor");
-                    stage.setScene(new Scene(root));
-                    stage.show();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+        openEditor.setOnAction(actionEvent -> {
+            try {
+                PopUpEditor.instance().setTranslateItem(translationTable, translationTable.getSelectionModel().getSelectedIndex());
+                PopUpEditor.instance().show();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });*/
+        });
 
         ObservableList<String> filterOptions = FXCollections.observableArrayList();
         filterOptions.add("Key");
