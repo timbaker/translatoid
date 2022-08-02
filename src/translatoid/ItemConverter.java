@@ -159,8 +159,22 @@ public class ItemConverter {
         String name = tokens[0];
         name = name.replace("evolvedrecipe", "");
         name = name.trim();
-        map.put("Recipe_" + name.replaceAll(" ", "_"), name);
-        count++;
+        String[] keyValues = tokens[1].split(",");
+        for (String keyValue : keyValues) {
+            if (keyValue.trim().length() == 0) {
+                continue;
+            }
+            if (!keyValue.contains(":")) {
+                continue;
+            }
+            String[] ss = keyValue.split(":");
+            String key = ss[0].trim();
+            String value = ss[1].trim();
+            if ("Name".equalsIgnoreCase(key)) {
+                map.put("Recipe_" + value.replaceAll(" ", "_"), value);
+                count++;
+            }
+        }
     }
 
     private void parseRecipe(String token) {
