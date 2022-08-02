@@ -154,8 +154,17 @@ public class ItemConverter {
         }
     }
 
+    private void parseEvolvedRecipe(String token) {
+        String[] tokens = token.split("[{}]");
+        String name = tokens[0];
+        name = name.replace("evolvedrecipe", "");
+        name = name.trim();
+        map.put("Recipe_" + name.replaceAll(" ", "_"), name);
+        count++;
+    }
+
     private void parseRecipe(String token) {
-        String tokens[] = token.split("[{}]");
+        String[] tokens = token.split("[{}]");
         String name = tokens[0];
         name = name.replace("recipe", "");
         name = name.trim();
@@ -166,6 +175,9 @@ public class ItemConverter {
     private void parseModuleToken(String token) {
         token = token.trim();
         if (m_findRecipe) {
+            if (token.indexOf("evolvedrecipe") == 0) {
+                parseEvolvedRecipe(token);
+            }
             if (token.indexOf("recipe") == 0) {
                 parseRecipe(token);
             }
